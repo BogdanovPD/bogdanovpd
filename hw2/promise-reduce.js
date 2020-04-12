@@ -9,10 +9,11 @@ var fn2 = () => new Promise(resolve => {
 })
 
 async function promiseReduce(asyncFunctions, reduce, initialValue) {
+    let memo = initialValue;
     for (fun of asyncFunctions) {
-        await fun().then(val => initialValue = reduce(initialValue, val))
+        memo = reduce(memo, await fun())
     }
-    return Promise.resolve(initialValue)
+    return memo
 }
 
 promiseReduce(
