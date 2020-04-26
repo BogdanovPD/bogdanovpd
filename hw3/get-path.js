@@ -2,7 +2,7 @@ function getPath(element) {
     let tags = [];
     while (element.tagName !== 'HTML') {
         if (element.hasAttribute('id')) {
-            tags.push('#' + element.id);
+            tags.push(`#${element.id}`);
         } else if (element.hasAttribute('class') && element.className) {
             tags.push('.' + element.className.split(' ').join('.'))
         } else {
@@ -11,5 +11,6 @@ function getPath(element) {
         element = element.parentElement
     }
     tags = tags.reverse()
-    return tags.join(' ')
+    path = tags.join(' ')
+    return document.querySelectorAll(path) > 0 ? null : path
 }
