@@ -1,0 +1,1 @@
+usage: npm run tree -- --path your_path
