@@ -1,0 +1,14 @@
+{
+  "name": "hw7",
+  "version": "1.0.0",
+  "description": "files tree",
+  "main": "server.js",
+  "scripts": {
+    "tree": "node server.js"
+  },
+  "author": "Pavel Bogdanov",
+  "license": "ISC",
+  "dependencies": {
+    "commander": "^5.1.0"
+  }
+}
