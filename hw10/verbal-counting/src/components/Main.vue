@@ -13,7 +13,7 @@
                     </v-col>
                     <v-spacer></v-spacer>
                     <v-col md="2">
-                      <v-toolbar-subtitle>Решено: {{solved}}</v-toolbar-subtitle>
+                      <v-toolbar-title class="text-body-2">Решено: {{solved}}</v-toolbar-title>
                     </v-col>
                   </v-row>
                 </v-container>
@@ -22,11 +22,11 @@
                 <v-container class="fill-width" fluid>
                   <v-row>
                     <v-col md="2">
-                      <v-btn>Отмена</v-btn>
+                      <v-btn @click="finish()">Отмена</v-btn>
                     </v-col>
                     <v-spacer></v-spacer>
                     <v-col md="2">
-                      <v-card-text  class="text-body-1">{{time}}</v-card-text>
+                      <v-card-text class="text-body-1">{{time}}</v-card-text>
                     </v-col>
                   </v-row>
                 </v-container>
@@ -41,10 +41,8 @@
                     >{{firstOperand}}</v-card-text>
                     <v-text-field
                       disabled
-                      dense
                       v-model="answer"
                       v-show="this.inputField === 1"
-                      class="text-h6"
                       v-bind:background-color="isCorrect ?  'green lighten-5' : ''"
                     ></v-text-field>
                   </v-col>
@@ -58,11 +56,9 @@
                       class="text-h6"
                     >{{secondOperand}}</v-card-text>
                     <v-text-field
-                      dense
                       disabled
                       v-model="answer"
                       v-show="this.inputField === 2"
-                      class="text-h6"
                       v-bind:background-color="isCorrect ?  'green lighten-5' : ''"
                     ></v-text-field>
                   </v-col>
@@ -72,7 +68,6 @@
                   <v-col md="3">
                     <v-card-text dense v-show="this.inputField !== 3" class="text-h6">{{res}}</v-card-text>
                     <v-text-field
-                      dense
                       disabled
                       v-model="answer"
                       v-show="this.inputField === 3"
@@ -122,8 +117,8 @@
                       color="grey lighten-1"
                       large
                       fab
-                      v-on:click="answer = answer.slice(0, -1)"
-                    >&lt;</v-btn>
+                      v-on:click="answer = answer.length === 0 ? '-' : answer.slice(0, -1)"
+                    >&lt;/-</v-btn>
                   </v-col>
                   <v-col md="2">
                     <v-btn
@@ -149,11 +144,26 @@
           </v-col>
         </v-row>
       </v-container>
+      <v-row justify="center">
+        <v-dialog v-model="isFinished" persistent max-width="320">
+          <v-card>
+            <v-card-title class="headline">Тренировка окончена</v-card-title>
+            <v-card-text>Ваш результат: {{solved}}</v-card-text>
+            <v-card-actions>
+              <router-link :to="{ path: '/' }">
+                <v-btn color="green darken-1" text @click="dialog = false">Завершить</v-btn>
+              </router-link>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
+      </v-row>
     </v-main>
   </div>
 </template>
 
 <script>
+import {Score} from '../store';
+
 export default {
   name: "Main",
   props: {
@@ -174,7 +184,8 @@ export default {
     inputField: 3,
     isCorrect: false,
     checkIfCorrectInterval: Object,
-    solved: 0
+    solved: 0,
+    isFinished: false
   }),
   computed: {
     time: function() {
@@ -233,7 +244,9 @@ export default {
       this.inputField = this.getRandomNumber(1, 3);
     },
     getFactorsArray: number =>
-      Array.from(Array(number + 1), (_, i) => i).filter(i => number % i === 0),
+      Array.from(Array(number + 1), (_, i) => i).filter(
+        i => number % i === 0 && number !== 0
+      ),
     getRandomElement: items => items[Math.floor(Math.random() * items.length)],
     getRandomNumber: (min, max) =>
       Math.floor(Math.random() * (max - min + 1)) + min,
@@ -243,6 +256,20 @@ export default {
         this.answer = "";
         this.setOperands();
       }
+    },
+    setVars: function() {
+      this.$store.dispatch("SET_LAST_RESULT", this.solved);
+      this.$store.dispatch("SET_LAST_TIME", this.duration);
+      this.$store.dispatch("SET_LAST_COMPLEXITY", this.complexity);
+      this.$store.dispatch("INCREMENT_GAMES_COUNT");
+      this.$store.dispatch(
+        "SET_SCORE",
+        new Score(this.solved, this.duration, this.complexity)
+      );
+    },
+    finish: function() {
+      this.setVars();
+      this.isFinished = true;
     }
   },
   beforeMount() {
@@ -276,6 +303,8 @@ export default {
     let timer = setInterval(() => {
       this.date = this.$moment(this.date.subtract(1, "seconds"));
       if (this.date.diff(this.$moment(0)) === 0) {
+        this.isFinished = true;
+        this.setVars();
         clearInterval(timer);
       }
     }, 1000);

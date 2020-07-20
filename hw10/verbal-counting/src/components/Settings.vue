@@ -12,9 +12,9 @@
 
               <v-card-title primary-title>Привет!</v-card-title>
               <v-card-text>
-                <div>Добро пожаловать на ваш 25 тренировочный день</div>
-                <div>Ваш последний результат - решено 10 из 25</div>
-                <div>Общая точность 80%</div>
+                <div>Добро пожаловать на вашу {{gamesCount}} тренировку</div>
+                <div>Ваш последний результат - решено {{lastResult}} за {{lastTime}} минут, co сложностью {{lastComplexity}}</div>
+                <div>Ваш лучший результат - решено {{bestScore.result}} за {{bestScore.time}} минут, co сложностью {{bestScore.complexity}}</div>
               </v-card-text>
               <v-card-title primary-title>Настройки</v-card-title>
                 <v-subheader>Длительность: {{duration}} минут</v-subheader>
@@ -30,7 +30,9 @@
               </v-card-text>
               <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn color="primary">Play</v-btn>
+                <router-link v-if="operators.length != 0" :to="{ name: 'training', params: { duration: this.duration, complexity: this.complexity, operators: this.operators } }">
+                <v-btn color="primary">Старт</v-btn>
+                </router-link>
               </v-card-actions>
             </v-card>
           </v-col>
@@ -53,11 +55,46 @@ export default {
       div: false,
       pow: false
     };
+  },
+  computed: {
+    operators() {
+      let ops = [];
+      if (this.sum) {
+        ops.push('+')
+      }
+      if (this.subtr) {
+        ops.push('-')
+      }
+      if (this.mult) {
+        ops.push('*')
+      }
+      if (this.div) {
+        ops.push('/')
+      }
+      if (this.pow) {
+        ops.push('^')
+      }
+      return ops;
+    },
+    lastResult() {
+      return this.$store.getters.LAST_RESULT;
+    },
+    lastTime() {
+      return this.$store.getters.LAST_TIME;
+    },
+    lastComplexity() {
+      return this.$store.getters.LAST_COMPLEXITY;
+    },
+    gamesCount() {
+      return this.$store.getters.GAMES_COUNT;
+    },
+    bestScore() {
+      return this.$store.getters.BEST_SCORE;
+    },
   }
 };
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 h3 {
   margin: 40px 0 0;
