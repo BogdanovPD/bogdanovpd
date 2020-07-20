@@ -1,0 +1,13 @@
+{
+  "name": "hw8",
+  "version": "1.0.0",
+  "description": "async file sort",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "create": "node -max-old-space-size=50 createFile.js",
+    "start": "node -max-old-space-size=50 server.js"
+  },
+  "author": "Pavel Bogdanov",
+  "license": "ISC"
+}

@@ -1,0 +1,2 @@
+Usage: npm run create - create file with numbers (random numbers from 0 to Int Max, leading zeros add to make a number equals 16)
+npm run start to start sorting (be careful - it's too slow for big files)
